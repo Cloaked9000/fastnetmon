@@ -243,7 +243,7 @@ class ban_settings_t {
             enable_warn_for_pps(false), enable_warn_for_bandwidth(false), enable_warn_for_flows_per_second(false),
             enable_ban_for_tcp_pps(false), enable_ban_for_tcp_bandwidth(false),
             enable_warn_for_tcp_pps(false), enable_warn_for_tcp_bandwidth(false),
-            enable_ban_for_udp_pps(false), enable_ban_for_udp_bandwidth(false
+            enable_ban_for_udp_pps(false), enable_ban_for_udp_bandwidth(false),
             enable_warn_for_udp_pps(false), enable_warn_for_udp_bandwidth(false),
             enable_ban_for_icmp_pps(false), enable_ban_for_icmp_bandwidth(false),
             enable_warn_for_icmp_pps(false), enable_warn_for_icmp_bandwidth(false),

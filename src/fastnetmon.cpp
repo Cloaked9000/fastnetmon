@@ -3000,16 +3000,12 @@ void execute_ip_warn(uint32_t client_ip, map_element average_speed_element, std:
         //Call warn handler
         call_warn_handlers(client_ip);
     }
-    else if(difftime(time(NULL), warn_list[client_ip]) > 10) //Else, check if warn has expired so remove from list
+    else if(difftime(time(NULL), warn_list[client_ip]) > current_warn_interval) //Else, check if warn has expired so remove from list
     {
         logger << log4cpp::Priority::INFO << "Removing " << client_ip << " from warn list!";
         warn_list_mutex.lock();
         warn_list.erase(client_ip);
         warn_list_mutex.unlock();
-    }
-    else
-    {
-        logger << log4cpp::Priority::INFO << client_ip << " was going to be warned. Time difference: " << difftime(time(NULL), warn_list[client_ip]);
     }
 }
 
@@ -4372,10 +4368,52 @@ bool exceed_mbps_speed(uint64_t in_counter, uint64_t out_counter, unsigned int t
 bool we_should_warn_this_ip(map_element* average_speed_element, ban_settings_t current_ban_settings)
 {
     // Unusual amount of packets,
-    if (current_ban_settings.enable_ban_for_pps &&
-        exceed_pps_warning_speed(average_speed_element->in_packets, average_speed_element->out_packets, 10)) {
+    if (current_ban_settings.enable_warn_for_pps &&
+        exceed_pps_speed(average_speed_element->in_packets, average_speed_element->out_packets, current_ban_settings.warn_threshold_pps)) {
         return true;
-        }
+    }
+
+    if (current_ban_settings.enable_warn_for_bandwidth &&
+        exceed_mbps_speed(average_speed_element->in_bytes, average_speed_element->out_bytes, current_ban_settings.warn_threshold_mbps)) {
+        return true;
+    }
+
+    if (current_ban_settings.enable_warn_for_flows_per_second &&
+        exceed_flow_speed(average_speed_element->in_flows, average_speed_element->out_flows, current_ban_settings.warn_threshold_flows)) {
+        return true;
+    }
+
+    // Per protocol pps thresholds
+    if (current_ban_settings.enable_warn_for_tcp_pps &&
+        exceed_pps_speed(average_speed_element->tcp_in_packets, average_speed_element->tcp_out_packets, current_ban_settings.warn_threshold_tcp_pps)) {
+        return true;
+    }
+
+    if (current_ban_settings.enable_warn_for_udp_pps &&
+        exceed_pps_speed(average_speed_element->udp_in_packets, average_speed_element->udp_out_packets, current_ban_settings.warn_threshold_udp_pps)) {
+        return true;
+    }
+
+    if (current_ban_settings.enable_warn_for_icmp_pps &&
+        exceed_pps_speed(average_speed_element->icmp_in_packets, average_speed_element->icmp_out_packets, current_ban_settings.warn_threshold_icmp_pps)) {
+        return true;
+    }
+
+    // Per protocol bandwidth thresholds
+    if (current_ban_settings.enable_warn_for_tcp_bandwidth &&
+        exceed_mbps_speed(average_speed_element->tcp_in_bytes, average_speed_element->tcp_out_bytes, current_ban_settings.warn_threshold_tcp_mbps)) {
+        return true;
+    }
+
+    if (current_ban_settings.enable_warn_for_udp_bandwidth &&
+        exceed_mbps_speed(average_speed_element->udp_in_bytes, average_speed_element->udp_out_bytes, current_ban_settings.warn_threshold_udp_mbps)) {
+        return true;
+    }
+
+    if (current_ban_settings.enable_warn_for_icmp_bandwidth &&
+        exceed_mbps_speed(average_speed_element->icmp_in_bytes, average_speed_element->icmp_out_bytes, current_ban_settings.warn_threshold_icmp_mbps)) {
+        return true;
+    }
 
     //All is good
     return false;

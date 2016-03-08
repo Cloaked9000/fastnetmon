@@ -370,6 +370,7 @@ map_of_vector_counters_for_flow SubnetVectorMapFlow;
 /* End of our data structs */
 boost::mutex ban_list_details_mutex;
 boost::mutex ban_list_mutex;
+boost::mutex warn_list_mutex;
 boost::mutex flow_counter;
 
 // map for flows
@@ -388,6 +389,9 @@ map_for_counters GeoIpCounter;
 // In ddos info we store attack power and direction
 std::map<uint32_t, banlist_item> ban_list;
 std::map<uint32_t, std::vector<simple_packet> > ban_list_details;
+
+// Store time when last warn occured
+std::map<uint32_t, time_t> warn_list;
 
 host_group_map_t host_groups;
 
@@ -2250,8 +2254,7 @@ void recalculate_speed() {
                     flow_attack_details =
                     print_flow_tracking_for_ip(*flow_counter_ptr, convert_ip_as_uint_to_string(client_ip));
                 }
-                logger << log4cpp::Priority::INFO << "WOULD NORMALLY WARN CLIENT AT THIS POINT <------";
-             //   execute_ip_warn(client_ip, *current_average_speed_element, flow_attack_details, itr->first);
+                execute_ip_warn(client_ip, *current_average_speed_element, flow_attack_details, itr->first);
             }
 
             SubnetVectorMapSpeed[itr->first][current_index] = new_speed_element;
@@ -2990,7 +2993,23 @@ bool exabgp_flow_spec_ban_manage(std::string action, std::string flow_spec_rule_
 }
 
 void execute_ip_warn(uint32_t client_ip, map_element average_speed_element, std::string flow_attack_details, subnet_t customer_subnet) {
-    call_warn_handlers(client_ip);
+    //Check if client is in warn list as we don't want to repeatedly warn
+    if(warn_list.count([client_ip]) == 0)
+    {
+        //Add IP to warn list so it doesn't get repeatedly warned
+        warn_list_mutex.lock();
+        warn_list[client_ip] = time();
+        warn_list_mutex.unlock();
+
+        //Call warn handler
+        call_warn_handlers(client_ip);
+    }
+    else if(difftime(warn_list[client_ip], time()) > 10) //Else, check if warn has expired so remove from list
+    {
+        warn_list_mutex.lock();
+        warn_list.erase(client_ip);
+        warn_list_mutex.unlock();
+    }
 }
 
 void execute_ip_ban(uint32_t client_ip, map_element average_speed_element, std::string flow_attack_details, subnet_t customer_subnet) {

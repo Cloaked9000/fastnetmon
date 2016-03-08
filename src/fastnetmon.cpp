@@ -3007,6 +3007,10 @@ void execute_ip_warn(uint32_t client_ip, map_element average_speed_element, std:
         warn_list.erase(client_ip);
         warn_list_mutex.unlock();
     }
+    else
+    {
+        logger << log4cpp::Priority::INFO << client_ip << " was going to be warned. Time difference: " << difftime(time(NULL), warn_list[client_ip]);
+    }
 }
 
 void execute_ip_ban(uint32_t client_ip, map_element average_speed_element, std::string flow_attack_details, subnet_t customer_subnet) {

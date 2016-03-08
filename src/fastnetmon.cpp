@@ -4172,7 +4172,7 @@ ban_settings_t read_ban_settings(configuration_map_t configuration_map, std::str
     }
 
     if (configuration_map.count(prefix + "enable_warn") != 0) {
-        ban_settings.enable_warm = configuration_map[prefix + "enable_warn"] == "on";
+        ban_settings.enable_warn = configuration_map[prefix + "enable_warn"] == "on";
     }
 
     if (configuration_map.count(prefix + "warn_interval_limit") != 0) {

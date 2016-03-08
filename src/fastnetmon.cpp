@@ -4294,7 +4294,6 @@ bool we_should_warn_this_ip(map_element* average_speed_element, ban_settings_t c
     // Unusual amount of packets,
     if (current_ban_settings.enable_ban_for_pps &&
         exceed_pps_warning_speed(average_speed_element->in_packets, average_speed_element->out_packets, 10)) {
-        logger << log4cpp::Priority::INFO  << "We detected this behaviour by pps warning";
         return true;
         }
 

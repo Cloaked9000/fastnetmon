@@ -251,7 +251,6 @@ void init_global_ban_settings() {
 
     // Ban enable/disable flag
     global_ban_settings.enable_ban = true;
-    logger << log4cpp::Priority::INFO << "Modified fastnetmon is running!";
 }
 
 bool enable_conection_tracking = true;

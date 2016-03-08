@@ -2993,19 +2993,18 @@ bool exabgp_flow_spec_ban_manage(std::string action, std::string flow_spec_rule_
 }
 
 void execute_ip_warn(uint32_t client_ip, map_element average_speed_element, std::string flow_attack_details, subnet_t customer_subnet) {
-    logger << log4cpp::Priority::INFO << " execute_ip_warn called.";
     //Check if client is in warn list as we don't want to repeatedly warn
     if(warn_list.count([client_ip]) == 0)
     {
         //Add IP to warn list so it doesn't get repeatedly warned
         warn_list_mutex.lock();
-        warn_list[client_ip] = time();
+        warn_list[client_ip] = time(NULL);
         warn_list_mutex.unlock();
 
         //Call warn handler
         call_warn_handlers(client_ip);
     }
-    else if(difftime(warn_list[client_ip], time()) > 10) //Else, check if warn has expired so remove from list
+    else if(difftime(warn_list[client_ip], time(NULL)) > 10) //Else, check if warn has expired so remove from list
     {
         logger << log4cpp::Priority::INFO << "Removing " << client_ip << " from warn list!";
         warn_list_mutex.lock();

@@ -2253,10 +2253,10 @@ void recalculate_speed() {
             else
             {
                 //IP shouldn't be banned and so add to whitelist
-                ip_whitelist.emplace_back(client_ip);
+                ip_whitelist.push_back(client_ip);
 
                 //Ensure that the IP isn't in the latent ban list
-                for(auto iter = latent_ban_list.begin(); iter != latent_ban_list.end();)
+                for(latent_ban_list::iterator iter = latent_ban_list.begin(); iter != latent_ban_list.end();)
                 {
                     if(iter->client_ip == client_ip)
                     {
@@ -2287,8 +2287,8 @@ void recalculate_speed() {
     }
 
     //Ban all IPs in the latent ban list
-    for(const auto &c : latent_ban_list)
-        execute_ip_ban(c.client_ip, c.average_speed_element, c.flow_attack_details, c.customer_subnet);
+    for(latent_ban_list::iterator iter = latent_ban_list.begin(); iter != latent_ban_list.end(); iter++)
+        execute_ip_ban(iter->client_ip, iter->average_speed_element, iter->flow_attack_details, iter->customer_subnet);
 
     // Calculate global flow speed
     incoming_total_flows_speed = uint64_t((double)incoming_total_flows / (double)speed_calc_period);

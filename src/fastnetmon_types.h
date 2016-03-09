@@ -306,6 +306,14 @@ class ban_settings_t {
         unsigned int warn_threshold_pps;
 };
 
+//Stores information about a ban that is imminent
+struct latent_ban_t {
+    uint32_t client_ip;
+    map_element current_average_speed_element;
+    std::string flow_attack_details;
+    subnet_t customer_subnet;
+};
+
 
 typedef std::map<std::string, ban_settings_t> host_group_ban_settings_map_t;
 

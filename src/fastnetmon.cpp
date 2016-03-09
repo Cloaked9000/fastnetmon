@@ -2988,8 +2988,13 @@ bool exabgp_flow_spec_ban_manage(std::string action, std::string flow_spec_rule_
     return true;
 }
 
-void get_pps_and_attack_direction(int in_pps, int out_pps, int out_bps, int *pps, direction *data_direction)
+void get_pps_and_attack_direction(const map_element &average_speed_element, uint64_t *pps, direction *data_direction)
 {
+    const uint64_t &in_pps = average_speed_element.in_packets;
+    const uint64_t &out_pps = average_speed_element.out_packets;
+    const uint64_t &in_bps = average_speed_element.in_bytes;
+    const uint64_t &out_bps = average_speed_element.out_bytes;
+
     // Detect attack direction with simple heuristic
     if (abs(int((int)in_pps - (int)out_pps)) < 1000) {
         // If difference between pps speed is so small we should do additional investigation using
@@ -3026,10 +3031,7 @@ void execute_ip_warn(uint32_t client_ip, map_element average_speed_element, std:
         direction data_direction;
         uint64_t pps = 0;
 
-        get_pps_and_attack_direction(average_speed_element.in_packets,
-                                    average_speed_element.out_packets,
-                                    average_speed_element.out_bytes,
-                                    &pps, &data_direction);
+        get_pps_and_attack_direction(average_speed_element, &pps, &data_direction);
 
         //Call warn handler
         call_warn_handlers(client_ip, pps, data_direction);
@@ -3063,7 +3065,7 @@ void execute_ip_ban(uint32_t client_ip, map_element average_speed_element, std::
     }
 
     //Get attack direction and pps
-    get_pps_and_attack_direction(in_pps, out_pps, out_bps, &pps, &data_direction);
+    get_pps_and_attack_direction(average_speed_element, &pps, &data_direction);
 
     current_attack.attack_protocol = detect_attack_protocol(average_speed_element, data_direction);
 
@@ -3190,9 +3192,6 @@ void execute_ip_ban(uint32_t client_ip, map_element average_speed_element, std::
 void call_warn_handlers(uint32_t client_ip, uint64_t attack_power, direction attack_direction) {
 
     if(notify_script_enabled) {
-        //Add to log
-        logger << log4cpp::Priority::INFO << "Running warning script for IP: " << client_ip_as_string;
-
         //Convert warn information to string to be passed as a script argument
         std::string client_ip_as_string = convert_ip_as_uint_to_string(client_ip);
         std::string pps_as_string = convert_int_to_string(attack_power);
@@ -3202,6 +3201,8 @@ void call_warn_handlers(uint32_t client_ip, uint64_t attack_power, direction att
         std::string script_call_params = notify_script_path + " " + client_ip_as_string + " " +
                                      data_direction_as_string + " " + pps_as_string +
                                      " " + "warn";
+        //Add to log
+        logger << log4cpp::Priority::INFO << "Running warning script for IP: " << client_ip_as_string;
 
         //Run script in another thread so as not to delay the main thread
         boost::thread exec_thread(exec_with_stdin_params, script_call_params, client_ip_as_string);

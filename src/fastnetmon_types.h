@@ -307,12 +307,15 @@ class ban_settings_t {
 };
 
 //Stores information about a ban that is imminent
-typedef struct {
+struct latent_ban {
+    latent_ban(uint32_t cip, map_element ase, std::string fad, subnet_t cs)
+    :client_ip(cip), average_speed_element(ase), flow_attack_details(fad), customer_subnet(cs) {}
+
     uint32_t client_ip;
     map_element average_speed_element;
     std::string flow_attack_details;
     subnet_t customer_subnet;
-} latent_ban;
+};
 
 
 typedef std::map<std::string, ban_settings_t> host_group_ban_settings_map_t;

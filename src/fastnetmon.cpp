@@ -3038,7 +3038,7 @@ void execute_ip_warn(uint32_t client_ip, map_element average_speed_element, std:
     }
     else if(difftime(time(NULL), warn_list[client_ip]) > current_warn_interval) //Else, check if warn has expired so remove from list
     {
-        logger << log4cpp::Priority::INFO << "Removing " << client_ip << " from warn list!";
+        logger << log4cpp::Priority::INFO << "Removing " << convert_ip_as_uint_to_string(client_ip) << " from warn list!";
         warn_list_mutex.lock();
         warn_list.erase(client_ip);
         warn_list_mutex.unlock();

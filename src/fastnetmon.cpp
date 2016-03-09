@@ -2167,7 +2167,7 @@ void recalculate_speed() {
     }
 
     std::vector<uint32_t> ip_whitelist; //map<ip>
-    std::vector<latent_ban_t> latent_ban_list;
+    std::vector<latent_ban> latent_ban_list;
 
     for (map_of_vector_counters::iterator itr = SubnetVectorMap.begin(); itr != SubnetVectorMap.end(); ++itr) {
         for (vector_of_counters::iterator vector_itr = itr->second.begin(); vector_itr != itr->second.end(); ++vector_itr) {

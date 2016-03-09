@@ -309,7 +309,7 @@ class ban_settings_t {
 //Stores information about a ban that is imminent
 typedef struct {
     uint32_t client_ip;
-    map_element current_average_speed_element;
+    map_element average_speed_element;
     std::string flow_attack_details;
     subnet_t customer_subnet;
 } latent_ban;

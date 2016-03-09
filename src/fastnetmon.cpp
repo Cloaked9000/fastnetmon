@@ -4206,7 +4206,7 @@ ban_settings_t read_ban_settings(configuration_map_t configuration_map, std::str
     }
 
     if (configuration_map.count(prefix + "warn_interval_limit") != 0) {
-        ban_settings.warn_interval_limit = configuration_map[prefix + "warn_interval_limit"] == "on";
+        ban_settings.warn_interval_limit = convert_string_to_integer(configuration_map[prefix + "warn_interval_limit"]);
     }
 
     if (configuration_map.count(prefix + "ban_for_pps") != 0) {

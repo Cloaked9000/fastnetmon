@@ -439,7 +439,7 @@ std::string generate_flow_spec_for_amplification_attack(amplification_attack_typ
 bool exabgp_flow_spec_ban_manage(std::string action, std::string flow_spec_rule_as_text);
 void call_attack_details_handlers(uint32_t client_ip, attack_details& current_attack, std::string attack_fingerprint);
 void call_ban_handlers(uint32_t client_ip, attack_details& current_attack, std::string flow_attack_details);
-void call_warn_handlers(uint32_t client_ip);
+void call_warn_handlers(uint32_t client_ip, uint64_t attack_power, direction attack_direction);
 void call_unban_handlers(uint32_t client_ip, attack_details& current_attack);
 ban_settings_t read_ban_settings(configuration_map_t configuration_map, std::string host_group_name = "");
 void exabgp_prefix_ban_manage(std::string action, std::string prefix_as_string_with_mask, std::string exabgp_next_hop,

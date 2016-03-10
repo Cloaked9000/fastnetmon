@@ -2165,7 +2165,8 @@ void recalculate_speed() {
             //    << "in pps: " << new_speed_element.in_packets << " out pps: " << new_speed_element.out_packets;
         }
     }
-
+    // <ip, <priority, action>>
+    std::map<uint32_t, std::pair<uint32_t, uint8_t>> bans;
     for (map_of_vector_counters::iterator itr = SubnetVectorMap.begin(); itr != SubnetVectorMap.end(); ++itr) {
         for (vector_of_counters::iterator vector_itr = itr->second.begin();
              vector_itr != itr->second.end(); ++vector_itr) {
@@ -2241,9 +2242,34 @@ void recalculate_speed() {
                 }
 
                 // TODO: we should pass type of ddos ban source (pps, flowd, bandwidth)!
-                execute_ip_ban(client_ip, *current_average_speed_element, flow_attack_details, itr->first);
+                //execute_ip_ban(client_ip, *current_average_speed_element, flow_attack_details, itr->first);
+                if(bans.count(client_ip) == 0)
+                {
+                    bans[client_ip] = std::make_pair(itr->size(), true);
+                }
+                else
+                {
+                    if(itr->size() > bans[client_ip].first > itr->size())
+                    {
+                        bans[client_ip] = std::make_pair(itr->size(), true);
+                    }
+                }
             }
-            else if (we_should_warn_this_ip(current_average_speed_element, current_ban_settings)) {
+            else
+            {
+                if(bans.count(client_ip) == 0)
+                {
+                    bans[client_ip] = std::make_pair(itr->size(), false);
+                }
+                else
+                {
+                    if(itr->size() > bans[client_ip].first > itr->size())
+                    {
+                        bans[client_ip] = std::make_pair(itr->size(), false);
+                    }
+                }
+            }
+            if (we_should_warn_this_ip(current_average_speed_element, current_ban_settings)) {
                 std::string flow_attack_details = "";
 
                 if (enable_conection_tracking) {
@@ -2256,6 +2282,18 @@ void recalculate_speed() {
             SubnetVectorMapSpeed[itr->first][current_index] = new_speed_element;
 
             *vector_itr = zero_map_element;
+        }
+    }
+
+    for(std::map<uint32_t, std::pair<uint32_t, uint8_t>>::iterator iter = bans.begin(); iter != bans.end(); iter++)
+    {
+        if(iter->second.second)
+        {
+            logger << log4cpp::Priority::INFO << "\nWould ban: " << convert_ip_as_uint_to_string(iter->first);
+        }
+        else
+        {
+            logger << log4cpp::Priority::INFO << "\nWould NOT ban: " << convert_ip_as_uint_to_string(iter->first);
         }
     }
 

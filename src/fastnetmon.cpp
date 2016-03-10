@@ -2166,7 +2166,7 @@ void recalculate_speed() {
         }
     }
     // <ip, <priority, action>>
-    std::map<uint32_t, std::pair<uint32_t, uint8_t>> bans;
+    std::map<uint32_t, std::pair<uint32_t, uint8_t> > bans;
     for (map_of_vector_counters::iterator itr = SubnetVectorMap.begin(); itr != SubnetVectorMap.end(); ++itr) {
         for (vector_of_counters::iterator vector_itr = itr->second.begin();
              vector_itr != itr->second.end(); ++vector_itr) {

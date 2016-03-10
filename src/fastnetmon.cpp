@@ -2245,13 +2245,13 @@ void recalculate_speed() {
                 //execute_ip_ban(client_ip, *current_average_speed_element, flow_attack_details, itr->first);
                 if(bans.count(client_ip) == 0)
                 {
-                    bans[client_ip] = std::make_pair(itr->size(), true);
+                    bans[client_ip] = std::make_pair(itr->second.size(), true);
                 }
                 else
                 {
-                    if(itr->size() > bans[client_ip].first > itr->size())
+                    if(itr->second.size() > bans[client_ip].first > itr->second.size())
                     {
-                        bans[client_ip] = std::make_pair(itr->size(), true);
+                        bans[client_ip] = std::make_pair(itr->second.size(), true);
                     }
                 }
             }
@@ -2259,13 +2259,13 @@ void recalculate_speed() {
             {
                 if(bans.count(client_ip) == 0)
                 {
-                    bans[client_ip] = std::make_pair(itr->size(), false);
+                    bans[client_ip] = std::make_pair(itr->second.size(), false);
                 }
                 else
                 {
-                    if(itr->size() > bans[client_ip].first > itr->size())
+                    if(itr->second.size() > bans[client_ip].first > itr->second.size())
                     {
-                        bans[client_ip] = std::make_pair(itr->size(), false);
+                        bans[client_ip] = std::make_pair(itr->second.size(), false);
                     }
                 }
             }
@@ -2285,7 +2285,7 @@ void recalculate_speed() {
         }
     }
 
-    for(std::map<uint32_t, std::pair<uint32_t, uint8_t>>::iterator iter = bans.begin(); iter != bans.end(); iter++)
+    for(std::map<uint32_t, std::pair<uint32_t, uint8_t> >::iterator iter = bans.begin(); iter != bans.end(); iter++)
     {
         if(iter->second.second)
         {

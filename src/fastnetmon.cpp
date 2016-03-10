@@ -1296,6 +1296,7 @@ bool load_configuration_file() {
         logger << log4cpp::Priority::INFO << "We will read ban settings for " << host_group_name;
 
         host_group_ban_settings_map[ host_group_name ] =  read_ban_settings(configuration_map, host_group_name);
+        host_group_ban_settings_map[ house_group_name ].is_in_hostgroup = true;
 
         //logger << log4cpp::Priority::INFO << "We read " << host_group_name << " ban settings "
         //    << print_ban_thresholds(host_group_ban_settings_map[ host_group_name ]);
@@ -2257,7 +2258,7 @@ void recalculate_speed() {
                     logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " is whitelisted and so not added to the ban list.";
                 }
             }
-            else if(current_ban_settings.is_in_hostgroup == false)
+            else if(current_ban_settings.is_in_hostgroup)
             {
                 logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " whitelisted. Limit: " << current_ban_settings.ban_threshold_pps;
                 //IP shouldn't be banned and so add to whitelist

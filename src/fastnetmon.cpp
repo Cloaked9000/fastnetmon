@@ -2255,7 +2255,7 @@ void recalculate_speed() {
                     logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " is whitelisted and so not added to the ban list.";
                 }
             }
-            else
+            else if(current_ban_settings != global_ban_settings)
             {
                 logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " whitelisted. Limit: " << current_ban_settings.ban_threshold_pps;
                 //IP shouldn't be banned and so add to whitelist

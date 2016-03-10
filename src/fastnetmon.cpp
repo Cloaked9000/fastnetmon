@@ -2253,7 +2253,6 @@ void recalculate_speed() {
             }
             else
             {
-                logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " has been whitelisted";
                 //IP shouldn't be banned and so add to whitelist
                 ip_whitelist.push_back(client_ip);
 
@@ -2262,7 +2261,6 @@ void recalculate_speed() {
                 {
                     if(iter->client_ip == client_ip)
                     {
-                        logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " has been removed from the latent ban list";
                         iter = latent_ban_list.erase(iter);
                     }
                     else

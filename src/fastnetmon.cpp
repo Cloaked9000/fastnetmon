@@ -2247,11 +2247,13 @@ void recalculate_speed() {
                     }
 
                     // TODO: we should pass type of ddos ban source (pps, flowd, bandwidth)!
+                    logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " is being added to the latent ban list.";
                     latent_ban_list.push_back(latent_ban(client_ip, *current_average_speed_element, flow_attack_details, itr->first));
                 }
             }
             else
             {
+                logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " has been whitelisted";
                 //IP shouldn't be banned and so add to whitelist
                 ip_whitelist.push_back(client_ip);
 
@@ -2260,6 +2262,7 @@ void recalculate_speed() {
                 {
                     if(iter->client_ip == client_ip)
                     {
+                        logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " has been removed from the latent ban list";
                         iter = latent_ban_list.erase(iter);
                     }
                     else
@@ -2288,7 +2291,10 @@ void recalculate_speed() {
 
     //Ban all IPs in the latent ban list
     for(std::vector<latent_ban>::iterator iter = latent_ban_list.begin(); iter != latent_ban_list.end(); iter++)
+    {
+        logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(iter->client_ip) << " has been banned";
         execute_ip_ban(iter->client_ip, iter->average_speed_element, iter->flow_attack_details, iter->customer_subnet);
+    }
 
     // Calculate global flow speed
     incoming_total_flows_speed = uint64_t((double)incoming_total_flows / (double)speed_calc_period);

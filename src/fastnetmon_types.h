@@ -238,7 +238,7 @@ class packed_conntrack_hash {
 // This class consists of all configuration of global or per subnet ban thresholds
 class ban_settings_t {
     public:
-        ban_settings_t() : is_in_hostgroup(false), enable_ban(false), enable_warn(false), warn_interval_limit(1800),
+        ban_settings_t() : enable_ban(false), enable_warn(false), warn_interval_limit(1800),
             enable_ban_for_pps(false), enable_ban_for_bandwidth(false), enable_ban_for_flows_per_second(false),
             enable_warn_for_pps(false), enable_warn_for_bandwidth(false), enable_warn_for_flows_per_second(false),
             enable_ban_for_tcp_pps(false), enable_ban_for_tcp_bandwidth(false),
@@ -257,7 +257,6 @@ class ban_settings_t {
             warn_threshold_mbps(0), warn_threshold_flows(0), warn_threshold_pps(0) {
 
         }
-        bool is_in_hostgroup;
         bool enable_ban;
         bool enable_warn;
         unsigned int warn_interval_limit;

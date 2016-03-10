@@ -225,8 +225,6 @@ bool exabgp_flow_spec_announces = false;
 ban_settings_t global_ban_settings;
 
 void init_global_ban_settings() {
-    global_ban_settings.is_in_hostgroup = true;
-
     // ban Configuration params
     global_ban_settings.enable_ban_for_pps = false;
     global_ban_settings.enable_ban_for_bandwidth = false;
@@ -1296,7 +1294,6 @@ bool load_configuration_file() {
         logger << log4cpp::Priority::INFO << "We will read ban settings for " << host_group_name;
 
         host_group_ban_settings_map[ host_group_name ] =  read_ban_settings(configuration_map, host_group_name);
-        host_group_ban_settings_map[ host_group_name ].is_in_hostgroup = true;
 
         //logger << log4cpp::Priority::INFO << "We read " << host_group_name << " ban settings "
         //    << print_ban_thresholds(host_group_ban_settings_map[ host_group_name ]);
@@ -2169,11 +2166,9 @@ void recalculate_speed() {
         }
     }
 
-    std::vector<uint32_t> ip_whitelist; //map<ip>
-    std::vector<latent_ban> latent_ban_list;
-
     for (map_of_vector_counters::iterator itr = SubnetVectorMap.begin(); itr != SubnetVectorMap.end(); ++itr) {
-        for (vector_of_counters::iterator vector_itr = itr->second.begin(); vector_itr != itr->second.end(); ++vector_itr) {
+        for (vector_of_counters::iterator vector_itr = itr->second.begin();
+             vector_itr != itr->second.end(); ++vector_itr) {
             int current_index = vector_itr - itr->second.begin();
 
             // New element
@@ -2183,7 +2178,7 @@ void recalculate_speed() {
             uint32_t subnet_ip = ntohl(itr->first.first);
             uint32_t client_ip_in_host_bytes_order = subnet_ip + current_index;
 
-            // convert to our standard network byte order
+            // covnert to our standard network byte order
             uint32_t client_ip = htonl(client_ip_in_host_bytes_order);
 
             // Calculate speed for IP or whole subnet
@@ -2238,48 +2233,17 @@ void recalculate_speed() {
             ban_settings_t current_ban_settings = get_ban_settings_for_this_subnet( itr->first );
 
             if (we_should_ban_this_ip(current_average_speed_element, current_ban_settings)) {
+                std::string flow_attack_details = "";
 
-                //Do not ban a whitelisted IP
-                if(std::find(ip_whitelist.begin(), ip_whitelist.end(), client_ip) == ip_whitelist.end())
-                {
-                    std::string flow_attack_details = "";
-
-                    if (enable_conection_tracking) {
-                        flow_attack_details =
-                        print_flow_tracking_for_ip(*flow_counter_ptr, convert_ip_as_uint_to_string(client_ip));
-                    }
-
-                    // TODO: we should pass type of ddos ban source (pps, flowd, bandwidth)!
-                    logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " is being added to the latent ban list.";
-                    latent_ban_list.push_back(latent_ban(client_ip, *current_average_speed_element, flow_attack_details, itr->first));
+                if (enable_conection_tracking) {
+                    flow_attack_details =
+                    print_flow_tracking_for_ip(*flow_counter_ptr, convert_ip_as_uint_to_string(client_ip));
                 }
-                else
-                {
-                    logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " is whitelisted and so not added to the ban list.";
-                }
+
+                // TODO: we should pass type of ddos ban source (pps, flowd, bandwidth)!
+                execute_ip_ban(client_ip, *current_average_speed_element, flow_attack_details, itr->first);
             }
-            else if(current_ban_settings.is_in_hostgroup)
-            {
-                logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " whitelisted. Limit: " << current_ban_settings.ban_threshold_pps;
-                //IP shouldn't be banned and so add to whitelist
-                ip_whitelist.push_back(client_ip);
-
-                //Ensure that the IP isn't in the latent ban list
-                for(std::vector<latent_ban>::iterator iter = latent_ban_list.begin(); iter != latent_ban_list.end();)
-                {
-                    if(iter->client_ip == client_ip)
-                    {
-                        iter = latent_ban_list.erase(iter);
-                    }
-                    else
-                    {
-                        iter++;
-                    }
-                }
-            }
-
-
-            if (we_should_warn_this_ip(current_average_speed_element, current_ban_settings) && current_ban_settings.enable_warn) {
+            else if (we_should_warn_this_ip(current_average_speed_element, current_ban_settings)) {
                 std::string flow_attack_details = "";
 
                 if (enable_conection_tracking) {
@@ -2293,13 +2257,6 @@ void recalculate_speed() {
 
             *vector_itr = zero_map_element;
         }
-    }
-
-    //Ban all IPs in the latent ban list
-    for(std::vector<latent_ban>::iterator iter = latent_ban_list.begin(); iter != latent_ban_list.end(); iter++)
-    {
-        logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(iter->client_ip) << " has been banned";
-       // execute_ip_ban(iter->client_ip, iter->average_speed_element, iter->flow_attack_details, iter->customer_subnet);
     }
 
     // Calculate global flow speed

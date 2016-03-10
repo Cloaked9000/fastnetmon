@@ -225,6 +225,8 @@ bool exabgp_flow_spec_announces = false;
 ban_settings_t global_ban_settings;
 
 void init_global_ban_settings() {
+    global_ban_settings.is_in_hostgroup = true;
+
     // ban Configuration params
     global_ban_settings.enable_ban_for_pps = false;
     global_ban_settings.enable_ban_for_bandwidth = false;
@@ -2255,7 +2257,7 @@ void recalculate_speed() {
                     logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " is whitelisted and so not added to the ban list.";
                 }
             }
-            else if(current_ban_settings != global_ban_settings)
+            else if(current_ban_settings.is_in_hostgroup == false)
             {
                 logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " whitelisted. Limit: " << current_ban_settings.ban_threshold_pps;
                 //IP shouldn't be banned and so add to whitelist

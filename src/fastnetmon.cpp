@@ -2237,7 +2237,7 @@ void recalculate_speed() {
             if (we_should_ban_this_ip(current_average_speed_element, current_ban_settings)) {
 
                 //Do not ban a whitelisted IP
-                if(std::find(ip_whitelist.begin(), ip_whitelist.end(), client_ip) != ip_whitelist.end())
+                if(std::find(ip_whitelist.begin(), ip_whitelist.end(), client_ip) == ip_whitelist.end())
                 {
                     std::string flow_attack_details = "";
 
@@ -2257,6 +2257,7 @@ void recalculate_speed() {
             }
             else
             {
+                logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " whitelisted. Limit: " << current_ban_settings.ban_threshold_udp_pps;
                 //IP shouldn't be banned and so add to whitelist
                 ip_whitelist.push_back(client_ip);
 
@@ -2295,7 +2296,7 @@ void recalculate_speed() {
     for(std::vector<latent_ban>::iterator iter = latent_ban_list.begin(); iter != latent_ban_list.end(); iter++)
     {
         logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(iter->client_ip) << " has been banned";
-        execute_ip_ban(iter->client_ip, iter->average_speed_element, iter->flow_attack_details, iter->customer_subnet);
+       // execute_ip_ban(iter->client_ip, iter->average_speed_element, iter->flow_attack_details, iter->customer_subnet);
     }
 
     // Calculate global flow speed

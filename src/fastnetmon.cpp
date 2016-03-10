@@ -2249,7 +2249,7 @@ void recalculate_speed() {
                 }
                 else
                 {
-                    if(itr->second.size() > bans[client_ip].first > itr->second.size())
+                    if(itr->second.size() > bans[client_ip].first)
                     {
                         bans[client_ip] = std::make_pair(itr->second.size(), true);
                     }
@@ -2263,7 +2263,7 @@ void recalculate_speed() {
                 }
                 else
                 {
-                    if(itr->second.size() > bans[client_ip].first > itr->second.size())
+                    if(itr->second.size() > bans[client_ip].first)
                     {
                         bans[client_ip] = std::make_pair(itr->second.size(), false);
                     }

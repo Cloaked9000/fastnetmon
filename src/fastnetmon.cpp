@@ -2237,7 +2237,7 @@ void recalculate_speed() {
             if (we_should_ban_this_ip(current_average_speed_element, current_ban_settings)) {
 
                 //Do not ban a whitelisted IP
-                if(std::find(ip_whitelist.begin(), ip_whitelist.end(), client_ip) == ip_whitelist.end())
+                if(std::find(ip_whitelist.begin(), ip_whitelist.end(), client_ip) != ip_whitelist.end())
                 {
                     std::string flow_attack_details = "";
 

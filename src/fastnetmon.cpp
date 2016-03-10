@@ -2250,6 +2250,10 @@ void recalculate_speed() {
                     logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " is being added to the latent ban list.";
                     latent_ban_list.push_back(latent_ban(client_ip, *current_average_speed_element, flow_attack_details, itr->first));
                 }
+                else
+                {
+                    logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(client_ip) << " is whitelisted and so not added to the ban list.";
+                }
             }
             else
             {

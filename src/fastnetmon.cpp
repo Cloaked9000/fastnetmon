@@ -1296,7 +1296,7 @@ bool load_configuration_file() {
         logger << log4cpp::Priority::INFO << "We will read ban settings for " << host_group_name;
 
         host_group_ban_settings_map[ host_group_name ] =  read_ban_settings(configuration_map, host_group_name);
-        host_group_ban_settings_map[ house_group_name ].is_in_hostgroup = true;
+        host_group_ban_settings_map[ host_group_name ].is_in_hostgroup = true;
 
         //logger << log4cpp::Priority::INFO << "We read " << host_group_name << " ban settings "
         //    << print_ban_thresholds(host_group_ban_settings_map[ host_group_name ]);

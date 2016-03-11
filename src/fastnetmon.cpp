@@ -2250,7 +2250,7 @@ void recalculate_speed() {
                     latent_ban_list.push_back(latent_ban(client_ip, *current_average_speed_element, flow_attack_details, itr->first));
                 }
             }
-            else if
+            else
             {
                 //IP shouldn't be banned and so add to whitelist
                 ip_whitelist.push_back(client_ip);

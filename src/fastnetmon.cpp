@@ -2293,7 +2293,7 @@ void recalculate_speed() {
         }
         else
         {
-            logger << log4cpp::Priority::INFO << "\nWould NOT ban: " << convert_ip_as_uint_to_string(iter->first);
+            //logger << log4cpp::Priority::INFO << "\nWould NOT ban: " << convert_ip_as_uint_to_string(iter->first);
         }
     }
 

@@ -2271,7 +2271,7 @@ void recalculate_speed() {
     {
         if(iter->second > 1)
         {
-            logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(iter->first) " would have been banned: " << iter->second;
+            logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(iter->first) << " would have been banned: " << iter->second;
         }
     }
 

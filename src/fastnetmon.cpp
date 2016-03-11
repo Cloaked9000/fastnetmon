@@ -2166,11 +2166,9 @@ void recalculate_speed() {
         }
     }
 
-    std::vector<uint32_t> ip_whitelist; //map<ip>
-    std::vector<latent_ban> latent_ban_list;
-
     for (map_of_vector_counters::iterator itr = SubnetVectorMap.begin(); itr != SubnetVectorMap.end(); ++itr) {
-        for (vector_of_counters::iterator vector_itr = itr->second.begin(); vector_itr != itr->second.end(); ++vector_itr) {
+        for (vector_of_counters::iterator vector_itr = itr->second.begin();
+             vector_itr != itr->second.end(); ++vector_itr) {
             int current_index = vector_itr - itr->second.begin();
 
             // New element
@@ -2180,7 +2178,7 @@ void recalculate_speed() {
             uint32_t subnet_ip = ntohl(itr->first.first);
             uint32_t client_ip_in_host_bytes_order = subnet_ip + current_index;
 
-            // convert to our standard network byte order
+            // covnert to our standard network byte order
             uint32_t client_ip = htonl(client_ip_in_host_bytes_order);
 
             // Calculate speed for IP or whole subnet
@@ -2235,42 +2233,17 @@ void recalculate_speed() {
             ban_settings_t current_ban_settings = get_ban_settings_for_this_subnet( itr->first );
 
             if (we_should_ban_this_ip(current_average_speed_element, current_ban_settings)) {
+                std::string flow_attack_details = "";
 
-                //Do not ban a whitelisted IP
-                if(std::find(ip_whitelist.begin(), ip_whitelist.end(), client_ip) == ip_whitelist.end())
-                {
-                    std::string flow_attack_details = "";
-
-                    if (enable_conection_tracking) {
-                        flow_attack_details =
-                        print_flow_tracking_for_ip(*flow_counter_ptr, convert_ip_as_uint_to_string(client_ip));
-                    }
-
-                    // TODO: we should pass type of ddos ban source (pps, flowd, bandwidth)!
-                    latent_ban_list.push_back(latent_ban(client_ip, *current_average_speed_element, flow_attack_details, itr->first));
+                if (enable_conection_tracking) {
+                    flow_attack_details =
+                    print_flow_tracking_for_ip(*flow_counter_ptr, convert_ip_as_uint_to_string(client_ip));
                 }
+
+                // TODO: we should pass type of ddos ban source (pps, flowd, bandwidth)!
+                execute_ip_ban(client_ip, *current_average_speed_element, flow_attack_details, itr->first);
             }
-            else
-            {
-                //IP shouldn't be banned and so add to whitelist
-                ip_whitelist.push_back(client_ip);
-
-                //Ensure that the IP isn't in the latent ban list
-                for(std::vector<latent_ban>::iterator iter = latent_ban_list.begin(); iter != latent_ban_list.end();)
-                {
-                    if(iter->client_ip == client_ip)
-                    {
-                        iter = latent_ban_list.erase(iter);
-                    }
-                    else
-                    {
-                        iter++;
-                    }
-                }
-            }
-
-
-            if (we_should_warn_this_ip(current_average_speed_element, current_ban_settings) && current_ban_settings.enable_warn) {
+            else if (we_should_warn_this_ip(current_average_speed_element, current_ban_settings)) {
                 std::string flow_attack_details = "";
 
                 if (enable_conection_tracking) {
@@ -2284,13 +2257,6 @@ void recalculate_speed() {
 
             *vector_itr = zero_map_element;
         }
-    }
-
-    //Ban all IPs in the latent ban list
-    for(std::vector<latent_ban>::iterator iter = latent_ban_list.begin(); iter != latent_ban_list.end(); iter++)
-    {
-        logger << log4cpp::Priority::INFO << convert_ip_as_uint_to_string(iter->client_ip) << " has been banned";
-       // execute_ip_ban(iter->client_ip, iter->average_speed_element, iter->flow_attack_details, iter->customer_subnet);
     }
 
     // Calculate global flow speed
@@ -3053,6 +3019,12 @@ void get_pps_and_attack_direction(const map_element &average_speed_element, uint
 
 
 void execute_ip_warn(uint32_t client_ip, map_element average_speed_element, std::string flow_attack_details, subnet_t customer_subnet, uint32_t current_warn_interval) {
+
+    if(global_ban_settings.enable_warn)
+    {
+        return;
+    }
+
     //Send a warn if they are not in the warn list, or their warn has expired
     if((warn_list.count(client_ip) == 0) || (difftime(time(NULL), warn_list[client_ip]) > current_warn_interval))
     {

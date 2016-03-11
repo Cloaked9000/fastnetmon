@@ -2249,7 +2249,7 @@ void recalculate_speed() {
                 }
                 else
                 {
-                    if(itr->second.size() > bans[client_ip].first)
+                    if(itr->second.size() < bans[client_ip].first)
                     {
                         bans[client_ip] = std::make_pair(itr->second.size(), true);
                     }
@@ -2263,7 +2263,7 @@ void recalculate_speed() {
                 }
                 else
                 {
-                    if(itr->second.size() > bans[client_ip].first)
+                    if(itr->second.size() < bans[client_ip].first)
                     {
                         bans[client_ip] = std::make_pair(itr->second.size(), false);
                     }
@@ -2293,7 +2293,7 @@ void recalculate_speed() {
         }
         else
         {
-            //logger << log4cpp::Priority::INFO << "\nWould NOT ban: " << convert_ip_as_uint_to_string(iter->first);
+            logger << log4cpp::Priority::INFO << "\nWould NOT ban: " << convert_ip_as_uint_to_string(iter->first);
         }
     }
 

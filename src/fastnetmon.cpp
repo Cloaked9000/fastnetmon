@@ -3020,11 +3020,6 @@ void get_pps_and_attack_direction(const map_element &average_speed_element, uint
 
 void execute_ip_warn(uint32_t client_ip, map_element average_speed_element, std::string flow_attack_details, subnet_t customer_subnet, uint32_t current_warn_interval) {
 
-    if(global_ban_settings.enable_warn)
-    {
-        return;
-    }
-
     //Send a warn if they are not in the warn list, or their warn has expired
     if((warn_list.count(client_ip) == 0) || (difftime(time(NULL), warn_list[client_ip]) > current_warn_interval))
     {
@@ -3211,6 +3206,10 @@ void call_warn_handlers(uint32_t client_ip, uint64_t attack_power, direction att
         //Run script in another thread so as not to delay the main thread
         boost::thread exec_thread(exec_with_stdin_params, script_call_params, client_ip_as_string);
         exec_thread.detach();
+    }
+    else
+    {
+        logger << log4cpp::Priority::INFO << "Warning script for IP: " << client_ip_as_string << " would have been run if notify script was enabled.";
     }
 }
 

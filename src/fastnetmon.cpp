@@ -3209,7 +3209,7 @@ void call_warn_handlers(uint32_t client_ip, uint64_t attack_power, direction att
     }
     else
     {
-        logger << log4cpp::Priority::INFO << "Warning script for IP: " << client_ip_as_string << " would have been run if notify script was enabled.";
+        logger << log4cpp::Priority::INFO << "Warning script for IP: " << convert_ip_as_uint_to_string(client_ip) << " would have been run if notify script was enabled.";
     }
 }
 

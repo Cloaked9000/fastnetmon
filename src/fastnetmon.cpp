@@ -2702,12 +2702,12 @@ int main(int argc, char** argv) {
         po::notify(vm);
 
         if (vm.count("help")) {
-            logger << log4cpp::Priority::INFO << desc << std::endl;
+            logger << log4cpp::Priority::INFO << desc;
             exit(EXIT_SUCCESS);
         }
 
         if (vm.count("version")) {
-            logger << log4cpp::Priority::INFO << "Version: " << fastnetmon_version << std::endl;
+            logger << log4cpp::Priority::INFO << "Version: " << fastnetmon_version;
             exit(EXIT_SUCCESS);
         }
 
@@ -2717,7 +2717,7 @@ int main(int argc, char** argv) {
 
         if (vm.count("configuration_file")) {
             global_config_path = vm["configuration_file"].as<std::string>();
-            logger << log4cpp::Priority::INFO << "We will use custom path to configuration file: " << global_config_path << std::endl;
+            logger << log4cpp::Priority::INFO << "We will use custom path to configuration file: " << global_config_path;
         }
     } catch (po::error& e) {
         std::cerr << "ERROR: " << e.what() << std::endl << std::endl;

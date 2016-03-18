@@ -771,7 +771,7 @@ void split_subnet(subnet_t subnetIP, subnet_t singleIP, std::vector<subnet_t> &a
     //Make sure subnet isn't a single IP
     if(subnetIP.second == 32)
     {
-        allIPS.emplace_back(subnetIP.first, subnetIP.second);
+        allIPS.push_back(std::make_pair(subnetIP.first, subnetIP.second));
         return;
     }
 
@@ -791,7 +791,7 @@ void split_subnet(subnet_t subnetIP, subnet_t singleIP, std::vector<subnet_t> &a
                 allIPS.erase(pos);
 
             //Lower half of subnet doesn't contain the IP, and so store it
-            allIPS.emplace_back(lower, subnetIP.second);
+            allIPS.push_back(std::make_pair(lower, subnetIP.second));
 
             //IP is in upper half so recursively split it
             split_subnet(std::make_pair(upper, subnetIP.second), singleIP, allIPS);
@@ -804,7 +804,7 @@ void split_subnet(subnet_t subnetIP, subnet_t singleIP, std::vector<subnet_t> &a
                 allIPS.erase(pos);
 
             //Upper half does not contain the IP, and so store it
-            allIPS.emplace_back(upper, subnetIP.second);
+            allIPS.push_back(std::make_pair(upper, subnetIP.second));
 
             //IP is in lower half, so recursively split it
             split_subnet(std::make_pair(lower, subnetIP.second), singleIP, allIPS);
@@ -1442,7 +1442,7 @@ bool load_configuration_file() {
     }
 
     //Find single IPs that have their own limits
-    std::vector<std::pair<std::string, subnet_t>> singleIP;
+    std::vector<std::pair<std::string, subnet_t> > singleIP;
     for(host_group_map_t::iterator iter = host_groups.begin(); iter != host_groups.end(); iter++)
     {
         //Go through each subnet in each subgroup
@@ -1453,7 +1453,7 @@ bool load_configuration_file() {
             if(current_subnet.second == 32)
             {
                 //This IP has its own limit, mark it
-                singleIP.emplace_back(std::make_pair(iter->first, current_subnet));
+                singleIP.push_back(std::make_pair(iter->first, current_subnet));
             }
         }
     }
@@ -2702,12 +2702,12 @@ int main(int argc, char** argv) {
         po::notify(vm);
 
         if (vm.count("help")) {
-            std::cout << desc << std::endl;
+            logger << log4cpp::Priority::INFO << desc << std::endl;
             exit(EXIT_SUCCESS);
         }
 
         if (vm.count("version")) {
-            std::cout << "Version: " << fastnetmon_version << std::endl;
+            logger << log4cpp::Priority::INFO << "Version: " << fastnetmon_version << std::endl;
             exit(EXIT_SUCCESS);
         }
 
@@ -2717,7 +2717,7 @@ int main(int argc, char** argv) {
 
         if (vm.count("configuration_file")) {
             global_config_path = vm["configuration_file"].as<std::string>();
-            std::cout << "We will use custom path to configuration file: " << global_config_path << std::endl;
+            logger << log4cpp::Priority::INFO << "We will use custom path to configuration file: " << global_config_path << std::endl;
         }
     } catch (po::error& e) {
         std::cerr << "ERROR: " << e.what() << std::endl << std::endl;

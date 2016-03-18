@@ -763,6 +763,55 @@ void store_data_in_redis(std::string key_name, std::string attack_details) {
 }
 #endif
 
+void split_subnet(subnet_t subnetIP, subnet_t singleIP, std::vector<subnet_t> &allIPS)
+{
+    //Store original subnet IP as it'll later be modified
+    subnet_t toRemove = subnetIP;
+
+    //Make sure subnet isn't a single IP
+    if(subnetIP.second == 32)
+    {
+        allIPS.emplace_back(subnetIP.first, subnetIP.second);
+        return;
+    }
+
+    //First check if the IP is actually in the subnet
+    if(in_subnet(singleIP.first, subnetIP.first, subnetIP.second))
+    {
+        //Bisect subnet into two, storing the upper and lower halfs
+        in_addr_t upper, lower;
+        bisect_subnet(subnetIP.first, &subnetIP.second, &upper, &lower);
+
+        //Check which half the IP is in now
+        if(in_subnet(singleIP.first, upper, subnetIP.second))
+        {
+            //Remove the original IP from AllIPS as it's been removed
+            std::vector<subnet_t>::iterator pos = std::find(allIPS.begin(), allIPS.end(), toRemove);
+            if(pos != allIPS.end())
+                allIPS.erase(pos);
+
+            //Lower half of subnet doesn't contain the IP, and so store it
+            allIPS.emplace_back(lower, subnetIP.second);
+
+            //IP is in upper half so recursively split it
+            split_subnet(std::make_pair(upper, subnetIP.second), singleIP, allIPS);
+        }
+        else
+        {
+            //Remove the original IP from AllIPS as it's been removed
+            std::vector<subnet_t>::iterator pos = std::find(allIPS.begin(), allIPS.end(), toRemove);
+            if(pos != allIPS.end())
+                allIPS.erase(pos);
+
+            //Upper half does not contain the IP, and so store it
+            allIPS.emplace_back(upper, subnetIP.second);
+
+            //IP is in lower half, so recursively split it
+            split_subnet(std::make_pair(lower, subnetIP.second), singleIP, allIPS);
+        }
+    }
+}
+
 std::string draw_table(direction data_direction, bool do_redis_update, sort_type sort_item) {
     std::vector<pair_of_map_elements> vector_for_sort;
 
@@ -1394,7 +1443,7 @@ bool load_configuration_file() {
 
     //Find single IPs that have their own limits
     std::vector<std::pair<std::string, subnet_t>> singleIP;
-    for(auto iter = host_groups.begin(); iter != host_groups.end(); iter++)
+    for(host_group_map_t::iterator iter = host_groups.begin(); iter != host_groups.end(); iter++)
     {
         //Go through each subnet in each subgroup
         for(unsigned int a = 0; a < iter->second.size(); a++)
@@ -1413,7 +1462,7 @@ bool load_configuration_file() {
     for(unsigned int a = 0; a < singleIP.size(); a++)
     {
         //Go through each subgroup
-        for(auto iter = host_groups.begin(); iter != host_groups.end(); iter++)
+        for(host_group_map_t::iterator iter = host_groups.begin(); iter != host_groups.end(); iter++)
         {
             //Each subnet in each hostgroup
             unsigned int actualSize = iter->second.size();
@@ -1424,20 +1473,20 @@ bool load_configuration_file() {
             }
 
             //Remove duplicates
-            sort(iter->second.begin(), iter->second.end());
+            std::sort(iter->second.begin(), iter->second.end());
             iter->second.erase(unique( iter->second.begin(), iter->second.end() ), iter->second.end());
         }
     }
 
     //If the larger subgroup specifically contains the smaller IP, we have to remove it
-    for(auto iter = host_groups.begin(); iter != host_groups.end(); iter++)
+    for(host_group_map_t::iterator iter = host_groups.begin(); iter != host_groups.end(); iter++)
     {
         for(unsigned int a = 0; a < singleIP.size(); a++)
         {
             if(iter->first != singleIP[a].first)
             {
                 //Check if this sub group contains the single IP
-                auto &cHost = host_groups[singleIP[a].first];
+                subnet_vector_t &cHost = host_groups[singleIP[a].first];
                 int findCount = std::count(cHost.begin(), cHost.end(), singleIP[a].second);
                 while(findCount > 0)
                 {
@@ -1451,14 +1500,13 @@ bool load_configuration_file() {
 
     //We've been modifying host_groups. We need to update subnet_to_host_groups
     subnet_to_host_groups.clear();
-    for(auto iter = host_groups.begin(); iter != host_groups.end(); iter++)
+    for(host_group_map_t::iterator iter = host_groups.begin(); iter != host_groups.end(); iter++)
     {
         for(unsigned int a = 0; a < iter->second.size(); a++)
         {
             subnet_to_host_groups[iter->second[a]] = iter->first;
         }
     }
-
     return true;
 }
 

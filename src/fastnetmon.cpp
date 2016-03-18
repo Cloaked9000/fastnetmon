@@ -1392,6 +1392,73 @@ bool load_configuration_file() {
         }
     }
 
+    //Find single IPs that have their own limits
+    std::vector<std::pair<std::string, subnet_t>> singleIP;
+    for(auto iter = host_groups.begin(); iter != host_groups.end(); iter++)
+    {
+        //Go through each subnet in each subgroup
+        for(unsigned int a = 0; a < iter->second.size(); a++)
+        {
+            //Check if the current subnet is a
+            subnet_t &current_subnet = iter->second[a];
+            if(current_subnet.second == 32)
+            {
+                //This IP has its own limit, mark it
+                singleIP.emplace_back(std::make_pair(iter->first, current_subnet));
+            }
+        }
+    }
+
+    //Go through each of the marked IPs
+    for(unsigned int a = 0; a < singleIP.size(); a++)
+    {
+        //Go through each subgroup
+        for(auto iter = host_groups.begin(); iter != host_groups.end(); iter++)
+        {
+            //Each subnet in each hostgroup
+            unsigned int actualSize = iter->second.size();
+            for(unsigned int b = 0; b < actualSize; b++)
+            {
+                //Split the subnets to make sure that they don't affect the custom limits
+                split_subnet(iter->second[b], singleIP[a].second, iter->second);
+            }
+
+            //Remove duplicates
+            sort(iter->second.begin(), iter->second.end());
+            iter->second.erase(unique( iter->second.begin(), iter->second.end() ), iter->second.end());
+        }
+    }
+
+    //If the larger subgroup specifically contains the smaller IP, we have to remove it
+    for(auto iter = host_groups.begin(); iter != host_groups.end(); iter++)
+    {
+        for(unsigned int a = 0; a < singleIP.size(); a++)
+        {
+            if(iter->first != singleIP[a].first)
+            {
+                //Check if this sub group contains the single IP
+                auto &cHost = host_groups[singleIP[a].first];
+                int findCount = std::count(cHost.begin(), cHost.end(), singleIP[a].second);
+                while(findCount > 0)
+                {
+                    //Keep erasing the duplicates until they're gone. Should be 1 max. If any. Just to be safe.
+                    iter->second.erase(std::find(iter->second.begin(), iter->second.end(), singleIP[a].second));
+                    findCount--;
+                }
+            }
+        }
+    }
+
+    //We've been modifying host_groups. We need to update subnet_to_host_groups
+    subnet_to_host_groups.clear();
+    for(auto iter = host_groups.begin(); iter != host_groups.end(); iter++)
+    {
+        for(unsigned int a = 0; a < iter->second.size(); a++)
+        {
+            subnet_to_host_groups[iter->second[a]] = iter->first;
+        }
+    }
+
     return true;
 }
 

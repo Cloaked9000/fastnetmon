@@ -3135,6 +3135,7 @@ void get_pps_and_attack_direction(const map_element &average_speed_element, uint
 
 void execute_ip_warn(uint32_t client_ip, map_element average_speed_element, std::string flow_attack_details, subnet_t customer_subnet, uint32_t current_warn_interval) {
 
+    logger << log4cpp::Priority::INFO << "execute_ip_warn was called for " << convert_ip_as_uint_to_string(client_ip);
     //Send a warn if they are not in the warn list, or their warn has expired
     if((warn_list.count(client_ip) == 0) || (difftime(time(NULL), warn_list[client_ip]) > current_warn_interval))
     {
@@ -3151,6 +3152,10 @@ void execute_ip_warn(uint32_t client_ip, map_element average_speed_element, std:
             //Call warn handler
             call_warn_handlers(client_ip, pps, data_direction);
         }
+    }
+    else
+    {
+        logger << log4cpp::Priority::INFO << "execute_ip_warn didn't pass warn criteria for " << convert_ip_as_uint_to_string(client_ip);
     }
 
     //Add IP to warn list/update its warn time

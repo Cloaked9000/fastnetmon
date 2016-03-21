@@ -4342,7 +4342,7 @@ ban_settings_t read_ban_settings(configuration_map_t configuration_map, std::str
     }
 
     if (configuration_map.count(prefix + "warn_for_pps") != 0) {
-        ban_settings.enable_warn_for_pps = configuration_map[prefix + "warm_for_pps"] == "on";
+        ban_settings.enable_warn_for_pps = configuration_map[prefix + "warn_for_pps"] == "on";
     }
 
     if (configuration_map.count(prefix + "ban_for_bandwidth") != 0) {

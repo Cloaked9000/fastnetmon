@@ -1344,8 +1344,8 @@ bool load_configuration_file() {
 
         host_group_ban_settings_map[ host_group_name ] =  read_ban_settings(configuration_map, host_group_name);
 
-        //logger << log4cpp::Priority::INFO << "We read " << host_group_name << " ban settings "
-        //    << print_ban_thresholds(host_group_ban_settings_map[ host_group_name ]);
+        logger << log4cpp::Priority::INFO << "We read " << host_group_name << " ban settings "
+            << print_ban_thresholds(host_group_ban_settings_map[ host_group_name ]);
     }
 
     if (configuration_map.count("white_list_path") != 0) {
@@ -1440,7 +1440,7 @@ bool load_configuration_file() {
             process_pcap_attack_dumps_with_dpi = configuration_map["process_pcap_attack_dumps_with_dpi"] == "on" ? true : false;
         }
     }
-/*
+
     //Find single IPs that have their own limits
     std::vector<std::pair<std::string, subnet_t> > singleIP;
     for(host_group_map_t::iterator iter = host_groups.begin(); iter != host_groups.end(); iter++)
@@ -1507,7 +1507,6 @@ bool load_configuration_file() {
             subnet_to_host_groups[iter->second[a]] = iter->first;
         }
     }
-    */
     return true;
 }
 

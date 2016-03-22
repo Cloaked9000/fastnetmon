@@ -1442,7 +1442,7 @@ bool load_configuration_file() {
     }
 
     //Find single IPs that have their own limits
-    std::vector<std::pair<std::string, subnet_t>> singleIP;
+    std::vector<std::pair<std::string, subnet_t> > singleIP;
     for(host_group_map_t::iterator iter = host_groups.begin(); iter != host_groups.end(); iter++)
     {
         //Go through each subnet in each subgroup

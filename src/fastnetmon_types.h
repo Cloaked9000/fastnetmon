@@ -247,14 +247,14 @@ class ban_settings_t {
             enable_warn_for_udp_pps(false), enable_warn_for_udp_bandwidth(false),
             enable_ban_for_icmp_pps(false), enable_ban_for_icmp_bandwidth(false),
             enable_warn_for_icmp_pps(false), enable_warn_for_icmp_bandwidth(false),
-            ban_threshold_tcp_mbps(99999), ban_threshold_tcp_pps(99999),
-            warn_threshold_tcp_mbps(99999), warn_threshold_tcp_pps(99999),
-            ban_threshold_udp_mbps(99999), ban_threshold_udp_pps(99999),
-            warn_threshold_udp_mbps(99999), warn_threshold_udp_pps(99999),
-            ban_threshold_icmp_mbps(99999), ban_threshold_icmp_pps(99999),
-            warn_threshold_icmp_mbps(99999), warn_threshold_icmp_pps(99999),
-            ban_threshold_mbps(99999), ban_threshold_flows(99999), ban_threshold_pps(99999),
-            warn_threshold_mbps(99999), warn_threshold_flows(99999), warn_threshold_pps(99999) {
+            ban_threshold_tcp_mbps(0), ban_threshold_tcp_pps(0),
+            warn_threshold_tcp_mbps(0), warn_threshold_tcp_pps(0),
+            ban_threshold_udp_mbps(0), ban_threshold_udp_pps(0),
+            warn_threshold_udp_mbps(0), warn_threshold_udp_pps(0),
+            ban_threshold_icmp_mbps(0), ban_threshold_icmp_pps(0),
+            warn_threshold_icmp_mbps(0), warn_threshold_icmp_pps(0),
+            ban_threshold_mbps(0), ban_threshold_flows(0), ban_threshold_pps(0),
+            warn_threshold_mbps(0), warn_threshold_flows(0), warn_threshold_pps(0) {
 
         }
         bool enable_ban;

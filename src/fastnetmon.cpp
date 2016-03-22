@@ -2358,7 +2358,7 @@ void recalculate_speed() {
                 // TODO: we should pass type of ddos ban source (pps, flowd, bandwidth)!
                 execute_ip_ban(client_ip, *current_average_speed_element, flow_attack_details, itr->first);
             }
-            if (we_should_warn_this_ip(current_average_speed_element, current_ban_settings)) {
+            else if (we_should_warn_this_ip(current_average_speed_element, current_ban_settings)) {
                 std::string flow_attack_details = "";
 
                 if (enable_conection_tracking) {

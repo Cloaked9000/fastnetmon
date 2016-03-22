@@ -1491,7 +1491,7 @@ bool load_configuration_file() {
                 while(findCount-- > 0)
                 {
                     //Keep erasing the duplicates until they're gone. Should be 1 max. If any. Just to be safe.
-                    auto c = std::find(iter->second.begin(), iter->second.end(), singleIP[a].second);
+                    subnet_vector_t::iterator c = std::find(iter->second.begin(), iter->second.end(), singleIP[a].second);
                     if(c != iter->second.end())
                         iter->second.erase(std::find(iter->second.begin(), iter->second.end(), singleIP[a].second));
                 }

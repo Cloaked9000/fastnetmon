@@ -1453,7 +1453,7 @@ bool load_configuration_file() {
             if(current_subnet.second == 32)
             {
                 //This IP has its own limit, mark it
-                singleIP.emplace_back(std::make_pair(iter->first, current_subnet));
+                singleIP.push_back(std::make_pair(iter->first, current_subnet));
             }
         }
     }

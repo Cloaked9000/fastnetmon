@@ -1442,7 +1442,7 @@ bool load_configuration_file() {
     }
 
     //Find single IPs that have their own limits
-    std::vector<std::pair<std::string, subnet_t> > singleIP;
+    std::vector<std::pair<std::string, subnet_t>> singleIP;
     for(host_group_map_t::iterator iter = host_groups.begin(); iter != host_groups.end(); iter++)
     {
         //Go through each subnet in each subgroup
@@ -1453,7 +1453,7 @@ bool load_configuration_file() {
             if(current_subnet.second == 32)
             {
                 //This IP has its own limit, mark it
-                singleIP.push_back(std::make_pair(iter->first, current_subnet));
+                singleIP.emplace_back(std::make_pair(iter->first, current_subnet));
             }
         }
     }
@@ -1488,11 +1488,12 @@ bool load_configuration_file() {
                 //Check if this sub group contains the single IP
                 subnet_vector_t &cHost = host_groups[singleIP[a].first];
                 int findCount = std::count(cHost.begin(), cHost.end(), singleIP[a].second);
-                while(findCount > 0)
+                while(findCount-- > 0)
                 {
                     //Keep erasing the duplicates until they're gone. Should be 1 max. If any. Just to be safe.
-                    iter->second.erase(std::find(iter->second.begin(), iter->second.end(), singleIP[a].second));
-                    findCount--;
+                    auto c = std::find(iter->second.begin(), iter->second.end(), singleIP[a].second);
+                    if(c != iter->second.end())
+                        iter->second.erase(std::find(iter->second.begin(), iter->second.end(), singleIP[a].second));
                 }
             }
         }

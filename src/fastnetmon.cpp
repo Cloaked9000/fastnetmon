@@ -223,7 +223,7 @@ bool exabgp_announce_host = false;
 bool exabgp_flow_spec_announces = false;
 
 //Subnets with a cidr of 32
-std::vector<std::pair<std::string, subnet_t>> singleIP;
+std::vector<std::pair<std::string, subnet_t> > singleIP;
 
 ban_settings_t global_ban_settings;
 
@@ -1166,12 +1166,6 @@ bool load_configuration_file() {
         }
     }
 
-    std::string subnetIP;
-    subnet_t tempSubnet;
-    tempSubnet = std::make_pair(convert_ip_as_string_to_uint("46.37.184.222"), 32);
-    settings = get_ban_settings_for_this_subnet(tempSubnet, subnetIP);
-    logger << log4cpp::Priority::INFO << "Returned subent name: " << subnetIP;
-    subnetIP.clear();
 
     if (configuration_map.count("enable_connection_tracking")) {
         if (configuration_map["enable_connection_tracking"] == "on") {
@@ -1695,8 +1689,6 @@ bool load_our_networks_list() {
 
     if (file_exists(networks_list_path)) {
         std::vector<std::string> network_list_from_config = read_file_to_vector(networks_list_path);
-
-        std::vector<std::string> network_list_from_config = read_file_to_vector(networks_list_path);
         std::vector<subnet_t> network_list;
         //Convert string network list to subnet_t's
         for(unsigned int a = 0; a < network_list_from_config.size(); a++)
@@ -1729,7 +1721,7 @@ bool load_our_networks_list() {
         network_list_from_config.clear();
         for(unsigned int a = 0; a < network_list.size(); a++)
         {
-            network_list_from_config.emplace_back(convert_subnet_to_string(network_list[a]));
+            network_list_from_config.push_back(convert_subnet_to_string(network_list[a]));
         }
 
         for (std::vector<std::string>::iterator line_itr = network_list_from_config.begin(); line_itr != network_list_from_config.end(); ++line_itr) {

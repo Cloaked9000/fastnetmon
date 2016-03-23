@@ -2229,7 +2229,7 @@ ban_settings_t get_ban_settings_for_this_subnet(subnet_t subnet, std::string& ho
             if(in_subnet(subnet.first, iter->first.first, iter->first.second))
             {
                 //Match
-                host_group_t = iter;
+                host_group_itr = iter;
                 break;
             }
         }

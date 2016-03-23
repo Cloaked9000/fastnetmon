@@ -456,6 +456,7 @@ void convert_integer_to_conntrack_hash_struct(packed_session* packed_connection_
                                               packed_conntrack_hash* unpacked_data);
 uint64_t convert_conntrack_hash_struct_to_integer(packed_conntrack_hash* struct_value);
 void cleanup_ban_list();
+ban_settings_t get_ban_settings_for_this_subnet(subnet_t subnet, std::string& host_group_name);
 std::string get_attack_description(uint32_t client_ip, attack_details& current_attack);
 void send_attack_details(uint32_t client_ip, attack_details current_attack_details);
 void free_up_all_resources();
@@ -2920,9 +2921,11 @@ int main(int argc, char** argv) {
     }
 #endif
 
-    tempSubnet = std::make_pair(46.37.184.222, 32);
+    std::string subnetIP;
+    subnet_t tempSubnet;
+    tempSubnet = std::make_pair(convert_ip_as_string_to_uint("46.37.184.222"), 32);
     ban_settings_t settings = get_ban_settings_for_this_subnet(tempSubnet, subnetIP);
-    logger << log4cpp::Priority::INFO << "2Returned subent name: " << subnetIP;
+    logger << log4cpp::Priority::INFO << "Returned subent name: " << subnetIP;
     subnetIP.clear();
 
     // Run screen draw thread

@@ -222,6 +222,9 @@ bool exabgp_announce_host = false;
 // With this flag we will announce more specfic then whole block Flow Spec announces
 bool exabgp_flow_spec_announces = false;
 
+//Subnets with a cidr of 32
+std::vector<std::pair<std::string, subnet_t>> singleIP;
+
 ban_settings_t global_ban_settings;
 
 void init_global_ban_settings() {
@@ -1693,6 +1696,42 @@ bool load_our_networks_list() {
     if (file_exists(networks_list_path)) {
         std::vector<std::string> network_list_from_config = read_file_to_vector(networks_list_path);
 
+        std::vector<std::string> network_list_from_config = read_file_to_vector(networks_list_path);
+        std::vector<subnet_t> network_list;
+        //Convert string network list to subnet_t's
+        for(unsigned int a = 0; a < network_list_from_config.size(); a++)
+        {
+            if(!network_list_from_config[a].empty())
+            {
+                network_list.push_back(convert_subnet_from_string_to_binary_with_cidr_format(network_list_from_config[a]));
+            }
+        }
+
+        //Compare the list to see if any match the hostgroups
+        for(unsigned int a = 0; a < singleIP.size(); a++)
+        {
+            size_t oldNetSize = network_list.size();
+            for(unsigned int b = 0; b < oldNetSize; b++)
+            {
+                if(in_subnet(singleIP[a].second.first, network_list[b].first, network_list[b].second))
+                {
+                    //We need to split the network list by this then
+                    split_subnet(network_list[b], singleIP[a].second, network_list);
+                }
+            }
+        }
+
+        //Remove duplicates
+        std::sort(network_list.begin(), network_list.end());
+        network_list.erase(unique( network_list.begin(), network_list.end() ), network_list.end());
+
+        //Convert the split subnet_t's back into string.......................... *throws up in mouth a little*
+        network_list_from_config.clear();
+        for(unsigned int a = 0; a < network_list.size(); a++)
+        {
+            network_list_from_config.emplace_back(convert_subnet_to_string(network_list[a]));
+        }
+
         for (std::vector<std::string>::iterator line_itr = network_list_from_config.begin(); line_itr != network_list_from_config.end(); ++line_itr) {
 
             if (line_itr->length() == 0) {
@@ -2919,13 +2958,6 @@ int main(int argc, char** argv) {
         service_thread_group.add_thread(new boost::thread(RunApiServer));
     }
 #endif
-
-    std::string subnetIP;
-    subnet_t tempSubnet;
-    tempSubnet = std::make_pair(convert_ip_as_string_to_uint("46.37.184.222"), 32);
-    ban_settings_t settings = get_ban_settings_for_this_subnet(tempSubnet, subnetIP);
-    logger << log4cpp::Priority::INFO << "Returned subent name: " << subnetIP;
-    subnetIP.clear();
 
     // Run screen draw thread
     service_thread_group.add_thread(new boost::thread(screen_draw_thread));

@@ -2229,7 +2229,7 @@ ban_settings_t get_ban_settings_for_this_subnet(subnet_t subnet, std::string& ho
             if(in_subnet(subnet.first, iter->first.first, iter->first.second))
             {
                 //Match
-                host_group_itr = iter;
+                host_group_name = iter->second;
                 break;
             }
         }
@@ -2245,8 +2245,8 @@ ban_settings_t get_ban_settings_for_this_subnet(subnet_t subnet, std::string& ho
             host_group_name = "global";
             return global_ban_settings;
         }
+        host_group_name = host_group_itr->second;
     }
-    host_group_name = host_group_itr->second;
 
     // We found host group for this subnet
     host_group_ban_settings_map_t::iterator hostgroup_settings_itr =

@@ -1166,7 +1166,7 @@ bool load_configuration_file() {
     std::string subnetIP;
     subnet_t tempSubnet;
     tempSubnet = std::make_pair(convert_ip_as_string_to_uint("46.37.184.222"), 32);
-    ban_settings_t settings = get_ban_settings_for_this_subnet(tempSubnet, subnetIP);
+    settings = get_ban_settings_for_this_subnet(tempSubnet, subnetIP);
     logger << log4cpp::Priority::INFO << "Returned subent name: " << subnetIP;
     subnetIP.clear();
 
@@ -1518,7 +1518,7 @@ bool load_configuration_file() {
     }
 
     tempSubnet = std::make_pair(convert_ip_as_string_to_uint("46.37.184.222"), 32);
-    ban_settings_t settings = get_ban_settings_for_this_subnet(tempSubnet, subnetIP);
+    settings = get_ban_settings_for_this_subnet(tempSubnet, subnetIP);
     logger << log4cpp::Priority::INFO << "Returned subent name: " << subnetIP;
     subnetIP.clear();
     return true;

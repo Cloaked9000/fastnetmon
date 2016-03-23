@@ -1162,6 +1162,13 @@ bool load_configuration_file() {
         }
     }
 
+    std::string subnetIP;
+    subnet_t tempSubnet;
+    tempSubnet = std::make_pair(convert_ip_as_string_to_uint("46.37.184.222"), 32);
+    ban_settings_t settings = get_ban_settings_for_this_subnet(tempSubnet, subnetIP);
+    logger << log4cpp::Priority::INFO << "Returned subent name: " << subnetIP;
+    subnetIP.clear();
+
     if (configuration_map.count("enable_connection_tracking")) {
         if (configuration_map["enable_connection_tracking"] == "on") {
             enable_conection_tracking = true;
@@ -1508,6 +1515,12 @@ bool load_configuration_file() {
             process_pcap_attack_dumps_with_dpi = configuration_map["process_pcap_attack_dumps_with_dpi"] == "on" ? true : false;
         }
     }
+    std::string subnetIP;
+    subnet_t tempSubnet;
+    tempSubnet = std::make_pair(convert_ip_as_string_to_uint("46.37.184.222"), 32);
+    ban_settings_t settings = get_ban_settings_for_this_subnet(tempSubnet, subnetIP);
+    logger << log4cpp::Priority::INFO << "Returned subent name: " << subnetIP;
+    subnetIP.clear();
     return true;
 }
 
@@ -2906,6 +2919,11 @@ int main(int argc, char** argv) {
         service_thread_group.add_thread(new boost::thread(RunApiServer));
     }
 #endif
+
+    tempSubnet = std::make_pair(46.37.184.222, 32);
+    ban_settings_t settings = get_ban_settings_for_this_subnet(tempSubnet, subnetIP);
+    logger << log4cpp::Priority::INFO << "2Returned subent name: " << subnetIP;
+    subnetIP.clear();
 
     // Run screen draw thread
     service_thread_group.add_thread(new boost::thread(screen_draw_thread));

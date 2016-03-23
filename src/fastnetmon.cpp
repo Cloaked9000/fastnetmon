@@ -2237,7 +2237,7 @@ ban_settings_t get_ban_settings_for_this_subnet(subnet_t subnet, std::string& ho
     else
     {
         // Try to find host group for this subnet using a direct match
-        subnet_to_host_group_map_t::iterator host_group_itr = subnet_to_host_groups.find( subnet );
+        host_group_itr = subnet_to_host_groups.find( subnet );
 
         if (host_group_itr == subnet_to_host_groups.end()) {
             // We haven't host groups for all subnets, it's OK

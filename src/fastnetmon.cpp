@@ -2219,24 +2219,41 @@ void recalculate_speed_thread_handler() {
 
 // Get ban settings for this subnet or return global ban settings
 ban_settings_t get_ban_settings_for_this_subnet(subnet_t subnet, std::string& host_group_name) {
-    // Try to find host group for this subnet
-    subnet_to_host_group_map_t::iterator host_group_itr = subnet_to_host_groups.find( subnet );
 
-    if (host_group_itr == subnet_to_host_groups.end()) {
-        // We haven't host groups for all subnets, it's OK
-        // logger << log4cpp::Priority::INFO << "We haven't custom host groups for this network. We will use global ban settings";
-        host_group_name = "global";
-        return global_ban_settings;
+    subnet_to_host_group_map_t::iterator host_group_itr = subnet_to_host_groups.end();
+    if(subnet.second == 32)
+    {
+        //Single IP so try and check if it's WITHIN another subnet
+        for(subnet_to_host_group_map_t::iterator iter = subnet_to_host_groups.begin(); iter != subnet_to_host_groups.end(); iter++++)
+        {
+            if(in_subnet(subnet.first, iter->first.first, iter->first.second))
+            {
+                //Match
+                host_group_t = iter;
+                break;
+            }
+        }
     }
+    else
+    {
+        // Try to find host group for this subnet using a direct match
+        subnet_to_host_group_map_t::iterator host_group_itr = subnet_to_host_groups.find( subnet );
 
+        if (host_group_itr == subnet_to_host_groups.end()) {
+            // We haven't host groups for all subnets, it's OK
+            // logger << log4cpp::Priority::INFO << "We haven't custom host groups for this network. We will use global ban settings";
+            host_group_name = "global";
+            return global_ban_settings;
+        }
+    }
     host_group_name = host_group_itr->second;
 
     // We found host group for this subnet
     host_group_ban_settings_map_t::iterator hostgroup_settings_itr =
-        host_group_ban_settings_map.find(host_group_itr->second);
+        host_group_ban_settings_map.find(host_group_name);
 
     if (hostgroup_settings_itr == host_group_ban_settings_map.end()) {
-        logger << log4cpp::Priority::ERROR << "We can't find ban settings for host group " << host_group_itr->second;
+        logger << log4cpp::Priority::ERROR << "We can't find ban settings for host group " << host_group_name;
         return global_ban_settings;
     }
 

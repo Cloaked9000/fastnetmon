@@ -2224,7 +2224,7 @@ ban_settings_t get_ban_settings_for_this_subnet(subnet_t subnet, std::string& ho
     if(subnet.second == 32)
     {
         //Single IP so try and check if it's WITHIN another subnet
-        for(subnet_to_host_group_map_t::iterator iter = subnet_to_host_groups.begin(); iter != subnet_to_host_groups.end(); iter++++)
+        for(subnet_to_host_group_map_t::iterator iter = subnet_to_host_groups.begin(); iter != subnet_to_host_groups.end(); iter++)
         {
             if(in_subnet(subnet.first, iter->first.first, iter->first.second))
             {

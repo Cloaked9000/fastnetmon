@@ -1516,8 +1516,7 @@ bool load_configuration_file() {
             process_pcap_attack_dumps_with_dpi = configuration_map["process_pcap_attack_dumps_with_dpi"] == "on" ? true : false;
         }
     }
-    std::string subnetIP;
-    subnet_t tempSubnet;
+
     tempSubnet = std::make_pair(convert_ip_as_string_to_uint("46.37.184.222"), 32);
     ban_settings_t settings = get_ban_settings_for_this_subnet(tempSubnet, subnetIP);
     logger << log4cpp::Priority::INFO << "Returned subent name: " << subnetIP;

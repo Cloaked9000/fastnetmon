@@ -914,7 +914,7 @@ std::string draw_table(direction data_direction, bool do_redis_update, sort_type
         uint64_t mbps_average = convert_speed_to_mbps(bps_average);
 
         std::string is_banned = ban_list.count(client_ip) > 0 ? " *banned* " : "";
-        std::string is_warned = warn_list.count(client_ip) > 0 ? " *warned* " : "";
+        std::string is_warned = warn_list.count(client_ip) > 0 ? "    *warned* " : "";
 
         // We use setw for alignment
         output_buffer << client_ip_as_string << "\t\t";
@@ -923,7 +923,7 @@ std::string draw_table(direction data_direction, bool do_redis_update, sort_type
         output_buffer << std::setw(6) << mbps << " mbps ";
         output_buffer << std::setw(6) << flows << " flows ";
 
-        output_buffer << is_warned << "\t" << is_banned << std::endl;
+        output_buffer << is_warned << "   " << is_banned << std::endl;
 
         element_number++;
     }

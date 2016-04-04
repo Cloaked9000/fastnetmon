@@ -1089,7 +1089,7 @@ bool load_configuration_file() {
 
         boost::split(parsed_config, line, boost::is_any_of(" ="), boost::token_compress_on);
 
-        if (parsed_config.size() == 2) {
+        if (parsed_config.size() > 1) { //Ensure that there's enough data to fill the config map
             configuration_map[parsed_config[0]] = parsed_config[1];
 
             // Well, we parse host groups here
@@ -2229,7 +2229,7 @@ ban_settings_t get_ban_settings_for_this_ip(uint32_t ip, std::string& host_group
         if(in_subnet(subnet.first, iter->first.first, iter->first.second))
         {
             //Match
-            std::cout << "\nFound a match: " << iter->second;
+            //std::cout << "\nFound a match: " << iter->second;
             host_group_name = iter->second;
             break;
         }
